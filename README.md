@@ -51,8 +51,16 @@ cd timsm
  
 ### 📌 Frontend 설정 (Flutter)
 
+#### 1. 기본 세팅
 1. https://codingapple.com/unit/flutter-install-on-windows-and-mac/
 2. https://minibcake.tistory.com/556
+
+#### 2. 패키지 다운로드
+1. Android Studio에서 `flutter` 폴더를 엽니다.
+2. 하단 터미널을 열고 필요한 패키지를 다운로드합니다.
+   ```bash
+   flutter pub get
+   ```
  
 ---
 
