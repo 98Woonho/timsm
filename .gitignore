@@ -1,0 +1,72 @@
+# ========================
+# 공통
+# ========================
+*.class
+*.log
+*.pyc
+*.swp
+.DS_Store
+.atom/
+.build/
+.buildlog/
+.history
+.svn/
+.swiftpm/
+migrate_working_dir/
+*.iml
+*.ipr
+*.iws
+.idea/
+
+# ========================
+# Flutter
+# ========================
+**/doc/api/
+**/ios/Flutter/.last_build_id
+flutter/.dart_tool/
+flutter/.flutter-plugins-dependencies
+flutter/.pub-cache/
+flutter/.pub/
+flutter/build/
+flutter/coverage/
+app.*.symbols
+app.*.map.json
+flutter/android/app/debug
+flutter/android/app/profile
+flutter/android/app/release
+
+# ========================
+# Spring Boot
+# ========================
+springboot/build/
+springboot/.gradle/
+springboot/out/
+springboot/bin/
+springboot/HELP.md
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+!gradle/wrapper/gradle-wrapper.jar
+!**/src/main/**/build/
+!**/src/test/**/build/
+!**/src/main/**/bin/
+!**/src/test/**/bin/
+!**/src/main/**/out/
+!**/src/test/**/out/
+
+# ojdbc8.jar 예외 (팀원 빌드용)
+!springboot/libs/ojdbc8.jar
+
+# ========================
+# VS Code
+# ========================
+# .vscode/  ← 팀 공유 설정이면 주석 유지 권장
