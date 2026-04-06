@@ -1,0 +1,20 @@
+# ==========================================
+# [초기 세팅 안내]
+# 1. 이 파일을 복사합니다.
+# 2. 파일 이름을 'application.properties'로 변경합니다.
+# 3. DB url, username, password를 적고 실행하세요.
+# ==========================================
+
+
+spring.application.name=demo
+
+# 오라클 DB 연결 설정
+spring.datasource.driver-class-name=oracle.jdbc.OracleDriver
+spring.datasource.url=jdbc:oracle:thin:@IP:PORT:SERVICE NAME
+spring.datasource.username=username
+spring.datasource.password=password
+
+mybatis.mapper-locations=classpath:mapper/**/*.xml
+mybatis.configuration.map-underscore-to-camel-case=true
+
+# logging.level.com.timsm.demo.mapper=DEBUG
