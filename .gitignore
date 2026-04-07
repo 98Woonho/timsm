@@ -43,6 +43,8 @@ springboot/.gradle/
 springboot/out/
 springboot/bin/
 springboot/HELP.md
+springboot/src/main/resources/application.properties
+springboot/src/main/resources/application.yml
 .apt_generated
 .classpath
 .factorypath

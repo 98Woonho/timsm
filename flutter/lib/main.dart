@@ -12,7 +12,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'TIMS 사원 관리',
+      title: 'TIMSM',
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
         useMaterial3: true,
@@ -37,7 +37,7 @@ class _EmployeeListScreenState extends State<EmployeeListScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('사원 명부 (Oracle 10g 연동)'),
+        title: const Text('사원 정보'),
         backgroundColor: Colors.blue.shade100,
       ),
       // FutureBuilder: 비동기 데이터(Future)를 기다려서 화면을 그려주는 아주 똑똑한 위젯입니다.

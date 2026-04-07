@@ -1,0 +1,23 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "java",
+            "name": "Run Spring",
+            "request": "launch",
+            "mainClass": "com.timsm.demo.DemoApplication"
+        },
+        {
+            "name": "Run Flutter",
+            "request": "launch",
+            "type": "dart",
+            "cwd": "${workspaceFolder}/flutter" 
+        }
+    ],
+    "compounds": [
+        {
+            "name": "🔥 풀스택 동시 실행",
+            "configurations": ["Run Spring", "Run Flutter"]
+        }
+    ]
+}
