@@ -25,6 +25,7 @@ Flutter + Spring Boot 기반 TIMS 모바일 앱
 ├── /flutter        # 프론트엔드
 └── /springboot     # 백엔드
 ```
+- `Android Studio(flutter)`와 `intellij(springboot)`, 2개의 IDE로 개발하는 방법이 있고, `VS Code` 하나로 개발하는 방법이 있습니다. `VS Code` 하나로 개발하는 방법은 맨 하단에 작성되어 있습니다.
 
 ---
  
