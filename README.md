@@ -59,6 +59,7 @@ cd timsm
 2. 하단 터미널을 열고 필요한 패키지를 다운로드합니다.
    ```bash
    flutter pub get
+   flutter pub add go_router
    ```
  
 ---
