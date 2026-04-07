@@ -1,4 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import 'package:timsm/widgets/common_dialogs.dart';
+import 'package:timsm/services/api_service.dart';
+import 'package:dio/dio.dart';
+import 'dart:convert';
+
 
 // StatefulWidget : 화면의 상태(데이터)가 변할 수 있는 위젯
 // 사용자가 글자를 입력하면 화면이 변해야 하므로 Stateful 사용
@@ -81,7 +87,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 TextField(
                   controller: _idController,          // 입력값을 _idController로 관리
                   decoration: const InputDecoration(
-                    labelText: '사원번호(ID)',         // 입력창 위에 표시되는 라벨
+                    labelText: 'ID',         // 입력창 위에 표시되는 라벨
                     border: OutlineInputBorder(),     // 사각형 테두리 스타일
                     prefixIcon: Icon(Icons.person),   // 입력창 왼쪽 아이콘
                   ),
@@ -93,7 +99,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   controller: _pwController,
                   obscureText: true, // 비밀번호 가리기
                   decoration: const InputDecoration(
-                    labelText: '비밀번호(PW)',
+                    labelText: 'PW',
                     border: OutlineInputBorder(),
                     prefixIcon: Icon(Icons.lock),
                   ),
@@ -109,9 +115,61 @@ class _LoginScreenState extends State<LoginScreen> {
                   child: ElevatedButton(
 
                     // onPressed: 버튼 클릭 시 실행할 함수
-                    onPressed: () {
-                      // 나중에 여기서 Backend API(Spring Boot)와 통신
-                      print('ID: ${_idController.text}, PW: ${_pwController.text}');
+                    onPressed: () async {
+                      final id = _idController.text;
+                      final pw = _pwController.text;
+
+                      if (id.isEmpty || pw.isEmpty) {
+                        CommonDialogs.showAlert(
+                          context: context,
+                          title: '로그인 실패',
+                          message: '아이디 또는 비밀번호를 입력해주세요.',
+                        );
+                        return;
+                      }
+
+                      try {
+                        final response = await ApiService.dio.post(
+                          '/login',
+                          data: {
+                            'userId': id,
+                            'userPass': pw,
+                          },
+                        );
+
+                        if (response.statusCode == 200) {
+                          if (context.mounted) {
+                            context.go('/home');
+                          }
+                        }
+                      } on DioException catch (e) {
+                        String errorMsg;
+
+                        switch (e.type) {
+                        // 네트워크 관련 에러는 Flutter에서 처리
+                          case DioExceptionType.connectionTimeout:
+                          case DioExceptionType.receiveTimeout:
+                            errorMsg = '서버 연결 시간이 초과되었습니다.';
+                            break;
+                          case DioExceptionType.connectionError:
+                            errorMsg = '서버에 연결할 수 없습니다. 관리자에게 문의하세요.';
+                            break;
+
+                          case DioExceptionType.badResponse:
+                          // 비즈니스 에러는 백엔드 메시지 그대로 사용
+                            errorMsg = e.response?.data['message'] ?? '오류가 발생했습니다.';
+                            break;
+
+                          default:
+                            errorMsg = '알 수 없는 오류가 발생했습니다.';
+                        }
+
+                        CommonDialogs.showAlert(
+                          context: context,
+                          title: '로그인 실패',
+                          message: errorMsg,
+                        );
+                      }
                     },
 
                     // styleFrom: 버튼 스타일 설정 위젯
