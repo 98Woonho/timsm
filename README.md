@@ -25,6 +25,7 @@ Flutter + Spring Boot 기반 TIMS 모바일 앱
 ├── /flutter        # 프론트엔드
 └── /springboot     # 백엔드
 ```
+- `Android Studio(flutter)`와 `intellij(springboot)`, 2개의 IDE로 개발하는 방법이 있고, `VS Code` 하나로 개발하는 방법이 있습니다. `VS Code` 하나로 개발하는 방법은 맨 하단에 작성되어 있습니다.
 
 ---
  
@@ -58,6 +59,7 @@ cd timsm
 2. 하단 터미널을 열고 필요한 패키지를 다운로드합니다.
    ```bash
    flutter pub get
+   flutter pub add go_router
    ```
  
 ---
@@ -91,15 +93,6 @@ springboot/libs/ojdbc8.jar 파일이 있는지 확인
 ```
 
 ---
-
-### 📌 VS Code 확장 프로그램
-- Flutter
-- Dart
-- Extension Pack for Java
-- Spring Boot Extension Pack
-- Gradle for Java
-- Debugger for Java
----
  
 ## 📌 새 설정 추가 시 규칙
  
@@ -115,13 +108,17 @@ springboot/libs/ojdbc8.jar 파일이 있는지 확인
  
 ---
 
-## 💻 flutter, spring boot 함께 실행하기
+## 💻 flutter, spring boot 함께 실행하는 방법
 
 별도의 터미널 명령어를 입력할 필요 없이 VS Code의 기능을 활용합니다.
 
-1. **에뮬레이터 실행**: 하단 상태 표시줄에서 실행할 기기(Android Emulator 또는 Web)를 선택합니다.
-2. **실행 및 디버그 탭 이동**: `Ctrl + Shift + D`를 누릅니다.
-3. **복합 실행 선택**: 상단 드롭다운 메뉴에서 **`풀스택 동시 실행`**을 선택합니다.
-4. **시작**: `F5` 키를 누르면 백엔드와 프론트엔드가 순차적으로 실행됩니다.
+1. **VS Code 확장 프로그램 설치**
+ - Extension Pack for Java
+ - Spring Boot Extension Pack
+ - Gradle for Java
+2. **에뮬레이터 실행**: 하단 상태 표시줄에서 실행할 기기(Android Emulator 또는 Web)를 선택합니다.
+3. **실행 및 디버그 탭 이동**: `Ctrl + Shift + D`를 누릅니다.
+4. **복합 실행 선택**: 상단 드롭다운 메뉴에서 **`풀스택 동시 실행`**을 선택합니다.
+5. **시작**: `F5` 키를 누르면 백엔드와 프론트엔드가 순차적으로 실행됩니다.
 
 ---
