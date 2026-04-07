@@ -7,12 +7,10 @@ Flutter + Spring Boot 기반 TIMS 모바일 앱
 ### Frontend
 * **Framework:** Flutter
 * **Language:** Dart
-* **Key Packages:** `http` (REST API 통신)
 
 ### Backend
 * **Framework:** Spring Boot 
 * **Language:** Java 8
-* **IDE:** IntelliJ IDEA
 * **Database Access:** MyBatis
 * **Database:** Oracle 10g
 
@@ -24,8 +22,8 @@ Flutter + Spring Boot 기반 TIMS 모바일 앱
 
 ```text
 /tims-project
-├── /flutter        # 프론트엔드 (Android Studio에서 이 폴더를 여세요)
-└── /springboot     # 백엔드 (IntelliJ IDEA에서 이 폴더를 여세요)
+├── /flutter        # 프론트엔드
+└── /springboot     # 백엔드
 ```
 
 ---
@@ -35,7 +33,7 @@ Flutter + Spring Boot 기반 TIMS 모바일 앱
 ### 사전 설치 항목
 - Flutter SDK
 - Android Studio
-- IntelliJ IDEA
+- VS Code
 - Git
  
 ---
@@ -56,7 +54,7 @@ cd timsm
 2. https://minibcake.tistory.com/556
 
 #### 2. 패키지 다운로드
-1. Android Studio에서 `flutter` 폴더를 엽니다.
+1. VS Code에서 `flutter` 폴더를 엽니다.
 2. 하단 터미널을 열고 필요한 패키지를 다운로드합니다.
    ```bash
    flutter pub get
@@ -92,6 +90,15 @@ spring.datasource.password={DB 비밀번호}
 springboot/libs/ojdbc8.jar 파일이 있는지 확인
 ```
 
+---
+
+### 📌 VS Code 확장 프로그램
+- Flutter
+- Dart
+- Extension Pack for Java
+- Spring Boot Extension Pack
+- Gradle for Java
+- Debugger for Java
 ---
  
 ## 📌 새 설정 추가 시 규칙
