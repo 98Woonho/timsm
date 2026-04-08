@@ -3,7 +3,6 @@ import 'package:go_router/go_router.dart';
 import 'package:timsm/widgets/common_dialogs.dart';
 import 'package:timsm/services/api_service.dart';
 import 'package:dio/dio.dart';
-import 'dart:convert';
 
 
 // StatefulWidget : 화면의 상태(데이터)가 변할 수 있는 위젯
@@ -139,7 +138,8 @@ class _LoginScreenState extends State<LoginScreen> {
 
                         if (response.statusCode == 200) {
                           if (context.mounted) {
-                            context.go('/home');
+                            //context.go('/home');
+                            context.go('/salary'); // 20260408 이운호 테스트용
                           }
                         }
                       } on DioException catch (e) {

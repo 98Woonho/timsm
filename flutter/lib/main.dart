@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:timsm/screens/login_screen.dart';
+import 'package:timsm/screens/salary_screens.dart';
+import 'package:timsm/screens/salary_screens2.dart';
+import 'package:timsm/widgets/main_layout.dart';
 
 void main() {
   runApp(const MyApp());
@@ -19,6 +22,21 @@ class MyApp extends StatelessWidget {
         GoRoute(
           path: '/login',
           builder: (context, state) => const LoginScreen(),
+        ),
+        ShellRoute(
+          builder: (context, state, child) {
+            return MainLayout(child: child);
+          },
+          routes: [
+            GoRoute(
+              path: '/salary',
+              builder: (context, state) => const SalaryScreen(),
+            ),
+            GoRoute(
+              path: '/salary2',
+              builder: (context, state) => const SalaryScreen2(),
+            ),
+          ],
         )
       ],
     );
