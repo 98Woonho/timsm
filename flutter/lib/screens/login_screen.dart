@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
+import 'package:timsm/models/employee_model.dart';
 import 'package:timsm/widgets/common_dialogs.dart';
 import 'package:timsm/services/api_service.dart';
 import 'package:dio/dio.dart';
+
+import '../providers/user_provider.dart';
 
 
 // StatefulWidget : 화면의 상태(데이터)가 변할 수 있는 위젯
@@ -137,9 +141,10 @@ class _LoginScreenState extends State<LoginScreen> {
                         );
 
                         if (response.statusCode == 200) {
+                          Provider.of<UserProvider>(context, listen: false).setUser(EmployeeModel.fromJson(response.data));
+
                           if (context.mounted) {
-                            //context.go('/home');
-                            context.go('/salary'); // 20260408 이운호 테스트용
+                            context.go('/salary2');
                           }
                         }
                       } on DioException catch (e) {
@@ -154,12 +159,9 @@ class _LoginScreenState extends State<LoginScreen> {
                           case DioExceptionType.connectionError:
                             errorMsg = '서버에 연결할 수 없습니다. 관리자에게 문의하세요.';
                             break;
-
                           case DioExceptionType.badResponse:
-                          // 비즈니스 에러는 백엔드 메시지 그대로 사용
                             errorMsg = e.response?.data['message'] ?? '오류가 발생했습니다.';
                             break;
-
                           default:
                             errorMsg = '알 수 없는 오류가 발생했습니다.';
                         }

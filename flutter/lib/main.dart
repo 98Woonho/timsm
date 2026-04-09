@@ -1,12 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
+import 'package:timsm/providers/user_provider.dart';
 import 'package:timsm/screens/login_screen.dart';
 import 'package:timsm/screens/salary_screens.dart';
 import 'package:timsm/screens/salary_screens2.dart';
 import 'package:timsm/widgets/main_layout.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => UserProvider()),
+      ],
+      child: const MyApp(),
+    )
+  );
 }
 
 class MyApp extends StatelessWidget {

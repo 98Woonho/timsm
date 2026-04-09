@@ -1,5 +1,6 @@
 // lib/screens/salary/salary_screen.dart
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart'; // 숫자 포맷 (1,000,000원)
 
 class SalaryScreen extends StatefulWidget {
@@ -48,9 +49,16 @@ class _SalaryScreenState extends State<SalaryScreen> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        title: Text('${salaryData['year']}년 ${salaryData['month']}월 급여명세서'),
+        title: Text('급여명세서'),
+        centerTitle: true,
         backgroundColor: Colors.blueAccent,
         foregroundColor: Colors.white,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back_ios),
+          onPressed: () {
+            context.pop();
+          },
+        ),
       ),
       body: InteractiveViewer(
         // =====================================================
@@ -64,6 +72,7 @@ class _SalaryScreenState extends State<SalaryScreen> {
           padding: const EdgeInsets.all(8.0),
           child: Column(
             children: [
+              const SizedBox(height: 10),
               _buildHeaderTable(),       // 기본 정보
               const SizedBox(height: 4),
               _buildPayTable(),          // 지급/공제 내역

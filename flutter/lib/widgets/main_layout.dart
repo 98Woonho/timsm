@@ -14,8 +14,8 @@ class MainLayout extends StatelessWidget {
       appBar: AppBar(
         title: const Text('TIMS-M'),
         centerTitle: true,
-        backgroundColor: Colors.blueAccent,
-        foregroundColor: Colors.white,
+        backgroundColor: Colors.white,
+        foregroundColor: Colors.blueGrey,
       ),
 
       // 화면 알맹이 (Home, Payslip 등 넘어오는 위젯이 여기에 꽂힘)
