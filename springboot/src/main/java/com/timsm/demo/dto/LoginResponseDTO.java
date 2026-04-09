@@ -10,8 +10,8 @@ import lombok.ToString;
 @Builder
 @ToString
 public class LoginResponseDTO {
-    private boolean success;
-    private String userId;
-    private String userName;
-    private String message;
+    private String empNo;
+    private String korNm;
+    private String corpCd;
+    private String deptCd;
 }

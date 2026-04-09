@@ -3,11 +3,16 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="com.timsm.demo.mapper.UserMapper">
-    <select id="findUserByIdAndPass" parameterType="com.timsm.demo.dto.LoginRequestDTO" resultType="map">
-        SELECT USER_ID
-        , USER_NAME
-        FROM   CM_USERS
-        WHERE  USER_ID   = #{userId}
-        AND    USER_PASS = #{userPass}
+    <select id="findUserByIdAndPass" parameterType="com.timsm.demo.dto.LoginRequestDTO" resultType="com.timsm.demo.dto.LoginResponseDTO">
+        SELECT u.USER_ID
+             , u.USER_NAME
+             , e.EMP_NO
+             , e.KOR_NM
+             , e.CORP_CD
+             , e.DEPT_CD
+        FROM   CM_USERS u
+        LEFT JOIN A_EMPLOYEE e ON e.EMP_NO = u.USER_ID
+        WHERE  u.USER_ID   = #{userId}
+        AND    u.USER_PASS = #{userPass}
     </select>
 </mapper>

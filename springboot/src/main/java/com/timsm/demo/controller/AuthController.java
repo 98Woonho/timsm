@@ -4,6 +4,7 @@ import com.timsm.demo.dto.LoginResponseDTO;
 import com.timsm.demo.dto.LoginRequestDTO;
 import com.timsm.demo.service.AuthService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -11,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.sql.SQLOutput;
+import java.util.Collections;
 
 @RestController
 @RequestMapping("/api")
@@ -20,15 +22,14 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginRequestDTO loginRequestDTO) {
-        LoginResponseDTO response = authService.login(loginRequestDTO);
+        LoginResponseDTO loginResponse = authService.login(loginRequestDTO);
 
-        System.out.println(loginRequestDTO);
-
-        if (!response.isSuccess()) {
-            // 로그인 실패 시 401 반환 → Flutter에서 401로 감지
-            return ResponseEntity.status(401).body(response);
+        if (loginResponse == null) {
+            return ResponseEntity
+                    .status(HttpStatus.UNAUTHORIZED)
+                    .body(Collections.singletonMap("message", "아이디나 비밀번호가 일치하지 않습니다."));
         }
 
-        return ResponseEntity.ok(response); // 200 반환
+        return ResponseEntity.ok(loginResponse);
     }
 }
