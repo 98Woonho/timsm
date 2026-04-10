@@ -12,6 +12,11 @@ import lombok.ToString;
 public class LoginResponseDTO {
     private String empNo;
     private String korNm;
-    private String corpCd;
-    private String deptCd;
+    private String birthDt;
+    private String enterDt;
+    private String chikcNm;
+    private String positionNm;
+    private String hobCd;
+    private String corpNm;
+    private String deptNm;
 }

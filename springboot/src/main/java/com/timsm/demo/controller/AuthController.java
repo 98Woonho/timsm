@@ -22,14 +22,6 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginRequestDTO loginRequestDTO) {
-        LoginResponseDTO loginResponse = authService.login(loginRequestDTO);
-
-        if (loginResponse == null) {
-            return ResponseEntity
-                    .status(HttpStatus.UNAUTHORIZED)
-                    .body(Collections.singletonMap("message", "아이디나 비밀번호가 일치하지 않습니다."));
-        }
-
-        return ResponseEntity.ok(loginResponse);
+        return ResponseEntity.ok(authService.login(loginRequestDTO));
     }
 }

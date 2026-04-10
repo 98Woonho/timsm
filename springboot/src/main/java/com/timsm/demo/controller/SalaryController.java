@@ -18,14 +18,6 @@ public class SalaryController {
 
     @GetMapping("/salary")
     public ResponseEntity<?> getSalaryList(@RequestParam String empNo) {
-        List<SalaryDTO> salaryList = salaryService.getSalaryList(empNo);
-
-        if (salaryList.isEmpty()) {
-            return ResponseEntity
-                    .status(HttpStatus.NOT_FOUND)
-                    .body(Collections.singletonMap("message", "급여내역이 존재하지 않습니다."));
-        }
-
-        return ResponseEntity.ok(salaryList);
+        return ResponseEntity.ok(salaryService.getSalaryList(empNo));
     }
 }

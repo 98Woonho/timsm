@@ -8,8 +8,13 @@
              , u.USER_NAME
              , e.EMP_NO
              , e.KOR_NM
-             , e.CORP_CD
-             , e.DEPT_CD
+             , e.BIRTH_DT
+             , e.ENTER_DT
+             , (SELECT CHIKC_NM FROM A_CHIKCCD WHERE CHIKC_CD = e.CHIKC_CD) AS CHIKC_NM
+             , (SELECT POSITION_NM FROM A_POSITIONCD WHERE POSITION_CD = e.POSITION_CD) AS POSITION_NM
+             , HOB_CD
+             , (SELECT CORP_NM FROM D_CORPORATION WHERE CORP_CD = e.CORP_CD) AS CORP_NM
+             , (SELECT DEPT_NM FROM A_DEPTCD WHERE DEPT_CD = e.DEPT_CD) AS DEPT_NM
         FROM   CM_USERS u
         LEFT JOIN A_EMPLOYEE e ON e.EMP_NO = u.USER_ID
         WHERE  u.USER_ID   = #{userId}
