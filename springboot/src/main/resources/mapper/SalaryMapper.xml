@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.timsm.demo.mapper.SalaryMapper">
+<select id="findSalaryListByEmpNo" parameterType="String" resultType="com.timsm.demo.dto.SalaryDTO">
+    SELECT p.PAY_YM
+         , p.EMP_NO
+         , p.SUPPLY_01, p.SUPPLY_02, p.SUPPLY_03, p.SUPPLY_04, p.SUPPLY_05
+         , p.SUPPLY_06, p.SUPPLY_07, p.SUPPLY_08, p.SUPPLY_09, p.SUPPLY_10
+         , p.SUPPLY_11, p.SUPPLY_12, p.SUPPLY_13, p.SUPPLY_14, p.SUPPLY_15
+         , p.SUPPLY_16, p.SUPPLY_17, p.SUPPLY_18, p.SUPPLY_19, p.SUPPLY_20
+         , p.SUPPLY_21, p.SUPPLY_22, p.SUPPLY_23, p.SUPPLY_24, p.SUPPLY_25
+         , p.SUPPLY_26, p.SUPPLY_27, p.SUPPLY_28, p.SUPPLY_29, p.SUPPLY_30
+         , p.SUPPLY_31, p.SUPPLY_32, p.SUPPLY_33, p.SUPPLY_34, p.SUPPLY_35
+         , p.SUPPLY_36, p.SUPPLY_37, p.SUPPLY_38, p.SUPPLY_39, p.SUPPLY_40
+         , p.SUPPLY_41, p.SUPPLY_42, p.SUPPLY_43, p.SUPPLY_44, p.SUPPLY_45
+         , p.SUPPLY_46, p.SUPPLY_47, p.SUPPLY_48, p.SUPPLY_49, p.SUPPLY_50
+         , p.SUPPLY_51, p.SUPPLY_52, p.SUPPLY_53, p.SUPPLY_54, p.SUPPLY_55
+         , p.PAY_AMT
+         , p.DEDUCT_01, p.DEDUCT_02, p.DEDUCT_03, p.DEDUCT_04, p.DEDUCT_05
+         , p.DEDUCT_06, p.DEDUCT_07, p.DEDUCT_08, p.DEDUCT_09, p.DEDUCT_10
+         , p.DEDUCT_11, p.DEDUCT_12, p.DEDUCT_13, p.DEDUCT_14, p.DEDUCT_15
+         , p.DEDUCT_16, p.DEDUCT_17, p.DEDUCT_18, p.DEDUCT_19, p.DEDUCT_20
+         , p.DEDUCT_21, p.DEDUCT_22, p.DEDUCT_23, p.DEDUCT_24, p.DEDUCT_25
+         , p.DEDUCT_26, p.DEDUCT_27, p.DEDUCT_28
+         , p.DEDUCT_AMT
+         , p.WORK_CNT
+         , CASE WHEN m.MLINE = '09' THEN m.MLINE_CNT ELSE m.AM END AS WORK_AM_CNT
+         , CASE WHEN m.MLINE = '05' OR m.MLINE = '13' THEN m.MLINE_CNT ELSE m.PM END AS WORK_PM_CNT
+         , p.EXTEN_CNT
+         , p.MIDNT_CNT
+         , p.HOLI_CNT
+         , p.TIME_PAY
+         , p.WORK_TIME_CNT
+         , p.HOLI_AM_DAY
+         , p.HOLI_PM_DAY
+    FROM C_PAYLIST p
+    LEFT JOIN C_MKEUN m ON p.EMP_NO = m.EMP_NO AND p.PAY_YM = m.YYMM
+    WHERE p.EMP_NO = #{empNo}
+      AND p.SALARYTYPE_CD = '100'
+    ORDER BY p.PAY_YM DESC
+</select>
+</mapper>
