@@ -6,7 +6,7 @@ import 'package:timsm/widgets/common_dialogs.dart';
 import 'package:timsm/services/api_service.dart';
 import 'package:dio/dio.dart';
 
-import '../providers/user_provider.dart';
+import '../providers/employee_provider.dart';
 
 
 // StatefulWidget : 화면의 상태(데이터)가 변할 수 있는 위젯
@@ -134,43 +134,22 @@ class _LoginScreenState extends State<LoginScreen> {
                       try {
                         final response = await ApiService.dio.post(
                           '/login',
-                          data: {
-                            'userId': id,
-                            'userPass': pw,
-                          },
+                          data: {'userId': id, 'userPass': pw},
                         );
 
                         if (response.statusCode == 200) {
-                          Provider.of<UserProvider>(context, listen: false).setUser(EmployeeModel.fromJson(response.data));
+                          Provider.of<EmployeeProvider>(context, listen: false).setEmployee(EmployeeModel.fromJson(response.data));
 
-                          if (context.mounted) {
-                            context.go('/salary2');
-                          }
+                          if (context.mounted) context.go('/salary2');
                         }
                       } on DioException catch (e) {
-                        String errorMsg;
-
-                        switch (e.type) {
-                        // 네트워크 관련 에러는 Flutter에서 처리
-                          case DioExceptionType.connectionTimeout:
-                          case DioExceptionType.receiveTimeout:
-                            errorMsg = '서버 연결 시간이 초과되었습니다.';
-                            break;
-                          case DioExceptionType.connectionError:
-                            errorMsg = '서버에 연결할 수 없습니다. 관리자에게 문의하세요.';
-                            break;
-                          case DioExceptionType.badResponse:
-                            errorMsg = e.response?.data['message'] ?? '오류가 발생했습니다.';
-                            break;
-                          default:
-                            errorMsg = '알 수 없는 오류가 발생했습니다.';
+                        if (context.mounted) {
+                          CommonDialogs.showAlert(
+                            context: context,
+                            title: '로그인 실패',
+                            message: e.error.toString(),  // 인터셉터에서 가공된 메시지
+                          );
                         }
-
-                        CommonDialogs.showAlert(
-                          context: context,
-                          title: '로그인 실패',
-                          message: errorMsg,
-                        );
                       }
                     },
 

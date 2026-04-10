@@ -9,5 +9,33 @@ class ApiService {
       receiveTimeout: const Duration(seconds: 3), // 응답 받는 대기 시간
       contentType: 'application/json', // 기본 헤더 설정
     ),
+  )..interceptors.add(
+      InterceptorsWrapper(
+        onError: (DioException e, handler) {
+          String errorMsg;
+
+          switch (e.type) {
+            case DioExceptionType.connectionTimeout:
+            case DioExceptionType.receiveTimeout:
+              errorMsg = '서버 연결 시간이 초과되었습니다.';
+              break;
+            case DioExceptionType.connectionError:
+              errorMsg = '서버에 연결할 수 없습니다. 관리자에게 문의하세요.';
+              break;
+            case DioExceptionType.badResponse:
+              errorMsg = e.response?.data['message'] ?? '오류가 발생했습니다.';
+              break;
+            default:
+              errorMsg = '알 수 없는 오류가 발생했습니다.';
+          }
+
+          handler.reject(
+            DioException(
+              requestOptions: e.requestOptions,
+              error: errorMsg,
+            ),
+          );
+        },
+      ),
   );
 }

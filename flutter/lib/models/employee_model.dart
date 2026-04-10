@@ -1,19 +1,35 @@
 class EmployeeModel {
-  final String message;
   final String empNo;
   final String korNm;
-  final String corpCd;
-  final String deptCd;
+  final String birthDt;
+  final String enterDt;
+  final String chikcNm;
+  final String positionNm;
+  final String hobCd;
+  final String corpNm;
+  final String deptNm;
 
-  EmployeeModel({required this.message, required this.empNo, required this.korNm, required this.corpCd, required this.deptCd});
+  EmployeeModel({required this.empNo,
+                required this.korNm,
+                required this.birthDt,
+                required this.enterDt,
+                required this.chikcNm,
+                required this.positionNm,
+                required this.hobCd,
+                required this.corpNm,
+                required this.deptNm,});
 
   factory EmployeeModel.fromJson(Map<String, dynamic> json) {
     return EmployeeModel(
-      message: json['message'] ?? '',
       empNo: json['empNo'] ?? '',
       korNm: json['korNm'] ?? '',
-      corpCd: json['corpCd'] ?? '',
-      deptCd: json['deptCd'] ?? '',
+      birthDt: json['birthDt'] ?? '',
+      enterDt: json['enterDt'] ?? '',
+      chikcNm: json['chikcNm'] ?? '',
+      positionNm: json['positionNm'] ?? '',
+      hobCd: json['hobCd'] ?? '',
+      corpNm: json['corpNm'] ?? '',
+      deptNm: json['deptNm'] ?? '',
     );
   }
 }

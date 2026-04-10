@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import 'package:dio/dio.dart';
 import 'package:provider/provider.dart';
 import 'package:timsm/models/salary_model.dart';
 import 'package:timsm/services/api_service.dart';
 import 'package:timsm/widgets/common_dialogs.dart';
-import 'package:timsm/providers/user_provider.dart';
+import 'package:timsm/providers/employee_provider.dart';
+import '../utils/string_extension.dart';
+import '../utils/number_extension.dart';
+
 
 class SalaryScreen2 extends StatefulWidget {
   const SalaryScreen2({super.key});
@@ -50,12 +52,12 @@ class _SalaryScreenState extends State<SalaryScreen2> {
   Future<void> _loadAll() async {
     setState(() => _isLoading = true);
 
-    final empNo = context.read<UserProvider>().user?.empNo;
+    final employee = context.read<EmployeeProvider>().employee;
 
     try {
       final response = await ApiService.dio.get(
         '/salary',
-        queryParameters: {'empNo': empNo},
+        queryParameters: {'empNo': employee?.empNo},
       );
 
       if (response.statusCode == 200) {
@@ -73,30 +75,11 @@ class _SalaryScreenState extends State<SalaryScreen2> {
         });
       }
     } on DioException catch (e) {
-      setState(() => _isLoading = false);
-
-      String errorMsg;
-
-      switch (e.type) {
-        case DioExceptionType.connectionTimeout:
-        case DioExceptionType.receiveTimeout:
-          errorMsg = '서버 연결 시간이 초과되었습니다.';
-          break;
-        case DioExceptionType.connectionError:
-          errorMsg = '서버에 연결할 수 없습니다. 관리자에게 문의하세요.';
-          break;
-        case DioExceptionType.badResponse:
-          errorMsg = e.response?.data['message'] ?? '오류가 발생했습니다.';
-          break;
-        default:
-          errorMsg = '알 수 없는 오류가 발생했습니다.';
-      }
-
       if (context.mounted) {
         CommonDialogs.showAlert(
           context: context,
           title: '급여 조회 실패',
-          message: errorMsg,
+          message: e.error.toString(),
         );
       }
     }
@@ -104,7 +87,7 @@ class _SalaryScreenState extends State<SalaryScreen2> {
 
   @override
   Widget build(BuildContext context) {
-    final user = context.watch<UserProvider>().user;
+    final employee = context.watch<EmployeeProvider>().employee;
 
     if (_isLoading) {
       return const Center(child: CircularProgressIndicator());
@@ -122,41 +105,95 @@ class _SalaryScreenState extends State<SalaryScreen2> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            // 1. 드롭다운 조회 조건
             _buildSearchCondition(),
             const SizedBox(height: 16),
 
             if (salary == null)
               const Center(child: Text('해당 월 데이터가 없습니다.'))
             else ...[
-              // 2. 실수령액 카드
-              _buildTotalAmountCard(salary),
-              const SizedBox(height: 20),
-
-              // 3. 아코디언
               _buildExpansionTile(
                 title: '1. 기본정보',
                 icon: Icons.person_outline,
                 children: [
-                  _buildInfoRow('귀속연월', salary.payYm),
-                  _buildInfoRow('사원번호', user?.empNo ?? ''),
-                  _buildInfoRow('성명', user?.korNm ?? ''),
+                  _buildInfoRow('성명', employee!.korNm),
+                  _buildInfoRow('사원번호', employee.empNo),
+                  _buildInfoRow('생년월일', employee.birthDt.toFormattedDate()),
+                  _buildInfoRow('입사일자', employee.enterDt.toFormattedDate()),
+                  _buildInfoRow('부서', employee.chikcNm),
+                  _buildInfoRow('직책', employee.positionNm),
+                  _buildInfoRow('호봉', employee.hobCd),
+                  _buildInfoRow('기본급', salary.timePay.toComma()),
                 ],
               ),
 
               _buildExpansionTile(
-                title: '2. 세부내역 (지급/공제)',
-                icon: Icons.receipt_long,
+                title: '2. 근로정보',
+                icon: Icons.person_outline,
                 children: [
-                  const Text('지급항목',
+                  const Text('근로일수',
                       style: TextStyle(fontWeight: FontWeight.bold, color: Colors.blue)),
                   const Divider(),
-                  _buildAmountRow('기본급', _fmt(salary.supply01)),
+                  _buildInfoRow('총일수', salary.workCnt),
+                  _buildInfoRow('오전', salary.workAmCnt),
+                  _buildInfoRow('오후', salary.workPmCnt),
                   const SizedBox(height: 15),
-                  const Text('공제항목',
+                  const Text('근로시간',
                       style: TextStyle(fontWeight: FontWeight.bold, color: Colors.red)),
                   const Divider(),
-                  _buildAmountRow('소득세', '394058345'),
+                  _buildInfoRow('총근무시간', '${salary.workTimeCnt + salary.extenCnt + salary.midntCnt + salary.holiCnt}'),
+                  _buildInfoRow('기본시간', '${salary.workTimeCnt}'),
+                  _buildInfoRow('연장시간', '${salary.extenCnt}'),
+                  _buildInfoRow('야간시간', '${salary.midntCnt}'),
+                  _buildInfoRow('주휴시간', '${salary.holiCnt}'),
+                  const SizedBox(height: 15),
+                  const Text('기타',
+                      style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black)),
+                  const Divider(),
+                  _buildInfoRowDouble('유급일수', '',  '유급근무일수', '${salary.holiAmDay + salary.holiPmDay}'),
+                  _buildInfoRowDouble('연차일수', '',  '연차사용일수', ''),
+                  _buildInfoRowDouble('휴가일수', '',  '교육일수', ''),
+                  _buildInfoRowDouble('보수교육일수', '',  '훈련일수', ''),
+                  _buildInfoRowDouble('사고일수', '',  '면제일수', ''),
+                  _buildInfoRowDouble('심야일수', '',  '시간급여', ''),
+                ],
+              ),
+
+              _buildExpansionTile(
+                title: '3. 세부내역',
+                icon: Icons.receipt_long,
+                children: [
+                  const Text('지급내역',
+                      style: TextStyle(fontWeight: FontWeight.bold, color: Colors.blue)),
+                  const Divider(),
+                  _buildInfoRowDouble('기본급', salary.supply01.toComma(),  '근로시간면제', salary.supply29.toComma()),
+                  _buildInfoRowDouble('연장수당', salary.supply03.toComma(),  '제수당', salary.supply11.toComma()),
+                  _buildInfoRowDouble('야간수당', salary.supply04.toComma(),  '운전상여금', salary.supply54.toComma()),
+                  _buildInfoRowDouble('주휴수당', salary.supply05.toComma(),  '보수교육비', salary.supply44.toComma()),
+                  _buildInfoRowDouble('휴일수당', salary.supply07.toComma(),  '운전자보험', salary.supply26.toComma()),
+                  _buildInfoRowDouble('상여금', salary.supply02.toComma(),  '기타상여금', salary.supply06.toComma()),
+                  _buildInfoRowDouble('오후야간', salary.supply19.toComma(),  '심야수당', salary.supply38.toComma()),
+                  _buildInfoRowDouble('시간급여', '-',  '직무/위험', salary.supply10.toComma()),
+                  _buildInfoRowDouble('근무성적수당', salary.supply21.toComma(),  '자격수당', salary.supply09.toComma()),
+                  _buildInfoRowDouble('무사고수당', salary.supply16.toComma(),  '기타수당', salary.supply12.toComma()),
+                  _buildInfoRowDouble('체력단련비', salary.supply28.toComma(),  '식 대', salary.supply20.toComma()),
+                  _buildInfoRowDouble('교육비', salary.supply22.toComma(),  '유급수당', salary.supply34.toComma()),
+                  _buildInfoRow('연차수당', salary.supply15.toComma()),
+                  const SizedBox(height: 5),
+                  _buildTotalRow('지급총액', salary.payAmt.toComma()),
+                  const SizedBox(height: 20),
+                  const Text('공제내역',
+                      style: TextStyle(fontWeight: FontWeight.bold, color: Colors.red)),
+                  const Divider(),
+                  _buildInfoRowDouble('소득세', salary.deduct01.toComma(),  '지방소득세', salary.deduct02.toComma()),
+                  _buildInfoRowDouble('국민연금', salary.deduct04.toComma(),  '건강보험', salary.deduct05.toComma()),
+                  _buildInfoRowDouble('요양보험', salary.deduct09.toComma(),  '고용보험', salary.deduct06.toComma()),
+                  _buildInfoRowDouble('노조비', salary.deduct07.toComma(),  '가불금', salary.deduct03.toComma()),
+                  _buildInfoRowDouble('송별금', salary.deduct11.toComma(),  '상조비', salary.deduct28.toComma()),
+                  _buildInfoRowDouble('상조가입', salary.deduct13.toComma(),  '기타공제', (salary.deduct21 + salary.deduct22).toComma()),
+                  _buildInfoRowDouble('동호회비', salary.deduct16.toComma(),  '경조비', salary.deduct27.toComma()),
+                  _buildInfoRow('교통비공제', '-'),
+                  const SizedBox(height: 5),
+                  _buildTotalRow('공제총액', salary.deductAmt.toComma()),
                 ],
               ),
             ],
@@ -207,46 +244,6 @@ class _SalaryScreenState extends State<SalaryScreen2> {
     );
   }
 
-  // 실수령액 카드
-  Widget _buildTotalAmountCard(SalaryModel salary) {
-    // SalaryModel 완성 후 실제 supply/deduct 전체 합산으로 교체
-    /*
-    final totalSupply = (salary.supply01 ?? 0) + (salary.supply02 ?? 0) +
-        (salary.supply03 ?? 0) + (salary.supply04 ?? 0) + (salary.supply05 ?? 0);
-    final totalDeduct = (salary.deduct01 ?? 0) + (salary.deduct02 ?? 0) +
-        (salary.deduct03 ?? 0) + (salary.deduct04 ?? 0) + (salary.deduct05 ?? 0);
-    final netPay = totalSupply - totalDeduct;*/
-
-    final netPay = 933942234;
-
-    return Container(
-      padding: const EdgeInsets.symmetric(vertical: 25, horizontal: 20),
-      decoration: BoxDecoration(
-        color: Colors.blueAccent,
-        borderRadius: BorderRadius.circular(15),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.blue.withOpacity(0.3),
-            blurRadius: 10,
-            offset: const Offset(0, 5),
-          ),
-        ],
-      ),
-      child: Column(
-        children: [
-          Text('${salary.payYm} 실수령액',
-              style: const TextStyle(color: Colors.white70, fontSize: 16)),
-          const SizedBox(height: 10),
-          Text(
-            '${_fmt(netPay)}',
-            style: const TextStyle(
-                color: Colors.white, fontSize: 32, fontWeight: FontWeight.bold),
-          ),
-        ],
-      ),
-    );
-  }
-
   Widget _buildExpansionTile({
     required String title,
     required IconData icon,
@@ -282,22 +279,63 @@ class _SalaryScreenState extends State<SalaryScreen2> {
     );
   }
 
-  Widget _buildAmountRow(String label, String amount) {
+  // 2개씩 한 행에 표시하는 위젯
+  Widget _buildInfoRowDouble(
+      String label1, String value1,
+      String label2, String value2,
+      ) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 5),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(label),
-          Text(amount, style: const TextStyle(fontWeight: FontWeight.bold)),
+          Expanded(
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(label1, style: const TextStyle(color: Colors.grey)),
+                Text(value1, style: const TextStyle(fontWeight: FontWeight.bold)),
+              ],
+            ),
+          ),
+          const SizedBox(width: 16),
+          const VerticalDivider(),
+          const SizedBox(width: 16),
+          Expanded(
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(label2, style: const TextStyle(color: Colors.grey)),
+                Text(value2, style: const TextStyle(fontWeight: FontWeight.bold)),
+              ],
+            ),
+          ),
         ],
       ),
     );
   }
 
-  String _fmt(num? value) {
-    if (value == null || value == 0) return '-';
-    return '${NumberFormat('#,###').format(value)}원';
+  Widget _buildTotalRow(String label, String value) {
+    return Container(
+      padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 12),
+      decoration: BoxDecoration(
+        color: Color.fromRGBO(220, 215, 215, 0.3215686274509804),
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(label,
+              style: const TextStyle(
+                fontWeight: FontWeight.bold
+              )),
+          Text(value,
+              style: const TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 16
+              )),
+        ],
+      ),
+    );
   }
 
   InputDecoration _dropdownDecoration() {
