@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
 import 'package:provider/provider.dart';
 import 'package:timsm/models/salary_model.dart';
+import 'package:timsm/models/salary_formula_model.dart';
 import 'package:timsm/services/api_service.dart';
 import 'package:timsm/widgets/common_dialogs.dart';
 import 'package:timsm/providers/employee_provider.dart';
@@ -18,6 +19,7 @@ class SalaryScreen2 extends StatefulWidget {
 
 class _SalaryScreenState extends State<SalaryScreen2> {
   List<SalaryModel> _salaryList = [];
+  List<SalaryFormulaModel> _salaryFormulaList = [];
   String? _selectedYear;
   String? _selectedMonth;
   bool _isLoading = true;
@@ -26,17 +28,18 @@ class _SalaryScreenState extends State<SalaryScreen2> {
       _salaryList.map((e) => e.payYm.substring(0, 4)).toSet().toList()
         ..sort((a, b) => b.compareTo(a));
 
-  List<String> get _monthList =>
-      _salaryList
-          .where((e) => e.payYm.substring(0, 4) == _selectedYear)
-          .map((e) => e.payYm.substring(4, 6))
-          .toList()
-        ..sort((a, b) => b.compareTo(a));
+  List<String> get _monthList {
+    final filtered = _salaryList
+        .where((e) => e.payYm.substring(0, 4) == _selectedYear)
+        .toList()
+      ..sort((a, b) => b.payYm.compareTo(a.payYm));
+    return filtered.map((e) => e.monthName).toList();
+  }
 
   SalaryModel? get _currentSalary {
     try {
       return _salaryList.firstWhere(
-            (e) => e.payYm == '$_selectedYear$_selectedMonth',
+            (e) => e.payYm.substring(0, 4) == _selectedYear && e.monthName == _selectedMonth,
       );
     } catch (_) {
       return null;
@@ -51,29 +54,39 @@ class _SalaryScreenState extends State<SalaryScreen2> {
 
   Future<void> _loadAll() async {
     setState(() => _isLoading = true);
-
     final employee = context.read<EmployeeProvider>().employee;
 
     try {
-      final response = await ApiService.dio.get(
-        '/salary',
-        queryParameters: {'empNo': employee?.empNo},
-      );
+      final results = await Future.wait([
+        ApiService.dio.get('/salary',
+            queryParameters: {'empNo': employee?.empNo}),
+        ApiService.dio.get('/salary/formula',
+            queryParameters: {
+              'corpCd'    : employee?.corpCd,
+              'chikcCd'   : employee?.chikcCd,
+              'positionCd': employee?.positionCd,
+            }),
+      ]);
 
-      if (response.statusCode == 200) {
-        final list = (response.data as List)
-            .map((e) => SalaryModel.fromJson(e))
-            .toList();
+      final salaryList = (results[0].data as List)
+          .map((e) => SalaryModel.fromJson(e))
+          .toList();
 
-        setState(() {
-          _salaryList = list;
-          if (list.isNotEmpty) {
-            _selectedYear = _yearList.first;
-            _selectedMonth = _monthList.first;
-          }
-          _isLoading = false;
-        });
-      }
+      final salaryFormulaList = (results[1].data as List)
+          .map((e) => SalaryFormulaModel.fromJson(e))
+          .toList();
+
+      setState(() {
+        _salaryList = salaryList;
+        _salaryFormulaList = salaryFormulaList;
+
+        if (salaryList.isNotEmpty) {
+          _selectedYear  = _yearList.first;
+          _selectedMonth = _monthList.first;
+        }
+
+        _isLoading = false;
+      });
     } on DioException catch (e) {
       if (context.mounted) {
         CommonDialogs.showAlert(
@@ -111,6 +124,28 @@ class _SalaryScreenState extends State<SalaryScreen2> {
             if (salary == null)
               const Center(child: Text('해당 월 데이터가 없습니다.'))
             else ...[
+              Container(
+                padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
+                decoration: BoxDecoration(
+                  color: Colors.blueAccent,
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const Text('실지급액',
+                        style: TextStyle(color: Colors.white, fontSize: 15)),
+                    Text(
+                      (salary.payAmt - salary.deductAmt).toComma(),
+                      style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 10),
               _buildExpansionTile(
                 title: '1. 기본정보',
                 icon: Icons.person_outline,
@@ -133,27 +168,27 @@ class _SalaryScreenState extends State<SalaryScreen2> {
                   const Text('근로일수',
                       style: TextStyle(fontWeight: FontWeight.bold, color: Colors.blue)),
                   const Divider(),
-                  _buildInfoRow('총일수', salary.workCnt),
-                  _buildInfoRow('오전', salary.workAmCnt),
-                  _buildInfoRow('오후', salary.workPmCnt),
+                  _buildInfoRow('총일수', '${salary.workCnt}'),
+                  _buildInfoRow('오전', '${salary.workAmCnt}'),
+                  _buildInfoRow('오후', '${salary.workPmCnt}'),
                   const SizedBox(height: 15),
                   const Text('근로시간',
                       style: TextStyle(fontWeight: FontWeight.bold, color: Colors.red)),
                   const Divider(),
-                  _buildInfoRow('총근무시간', '${salary.workTimeCnt + salary.extenCnt + salary.midntCnt + salary.holiCnt}'),
+                  _buildInfoRow('총근무시간', '${salary.workTimeCnt + salary.extenCnt + salary.midntCnt + salary.holiWorkCnt}'),
                   _buildInfoRow('기본시간', '${salary.workTimeCnt}'),
                   _buildInfoRow('연장시간', '${salary.extenCnt}'),
                   _buildInfoRow('야간시간', '${salary.midntCnt}'),
-                  _buildInfoRow('주휴시간', '${salary.holiCnt}'),
+                  _buildInfoRow('주휴시간', '${salary.holiWorkCnt}'),
                   const SizedBox(height: 15),
                   const Text('기타',
                       style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black)),
                   const Divider(),
-                  _buildInfoRowDouble('유급일수', '',  '유급근무일수', '${salary.holiAmDay + salary.holiPmDay}'),
-                  _buildInfoRowDouble('연차일수', '',  '연차사용일수', ''),
-                  _buildInfoRowDouble('휴가일수', '',  '교육일수', ''),
+                  _buildInfoRowDouble('유급일수', '${salary.holiCnt}',  '유급근무일수', '${salary.holiAmDay + salary.holiPmDay}'),
+                  _buildInfoRowDouble('연차일수', '${salary.vacCnt}',  '연차사용일수', '${salary.vacUseCnt}'),
+                  _buildInfoRowDouble('휴가일수', '',  '교육일수', '${salary.eduCnt}'),
                   _buildInfoRowDouble('보수교육일수', '',  '훈련일수', ''),
-                  _buildInfoRowDouble('사고일수', '',  '면제일수', ''),
+                  _buildInfoRowDouble('사고일수', '${salary.acctCnt}',  '면제일수', ''),
                   _buildInfoRowDouble('심야일수', '',  '시간급여', ''),
                 ],
               ),
@@ -177,7 +212,8 @@ class _SalaryScreenState extends State<SalaryScreen2> {
                   _buildInfoRowDouble('무사고수당', salary.supply16.toComma(),  '기타수당', salary.supply12.toComma()),
                   _buildInfoRowDouble('체력단련비', salary.supply28.toComma(),  '식 대', salary.supply20.toComma()),
                   _buildInfoRowDouble('교육비', salary.supply22.toComma(),  '유급수당', salary.supply34.toComma()),
-                  _buildInfoRow('연차수당', salary.supply15.toComma()),
+                  _buildInfoRowDouble('연차수당', salary.supply15.toComma(),  '청원휴가', salary.supply25.toComma()),
+                  _buildInfoRowDouble('유급휴가', salary.supply08.toComma(),  '대무수당', salary.supply37.toComma()),
                   const SizedBox(height: 5),
                   _buildTotalRow('지급총액', salary.payAmt.toComma()),
                   const SizedBox(height: 20),
@@ -195,6 +231,13 @@ class _SalaryScreenState extends State<SalaryScreen2> {
                   const SizedBox(height: 5),
                   _buildTotalRow('공제총액', salary.deductAmt.toComma()),
                 ],
+              ),
+              _buildExpansionTile(
+                title: '4. 산출세부내역',
+                icon: Icons.receipt_long,
+                children: _salaryFormulaList
+                  .map((formula) => _buildFormulaRow(formula.salaryNm, formula.formula))
+                  .toList(),
               ),
             ],
           ],
@@ -229,10 +272,7 @@ class _SalaryScreenState extends State<SalaryScreen2> {
             value: _selectedMonth,
             decoration: _dropdownDecoration(),
             items: _monthList
-                .map((m) => DropdownMenuItem(
-              value: m,
-              child: Text('${m.toString().padLeft(2, '0')}월'),
-            ))
+                .map((m) => DropdownMenuItem(value: m, child: Text(m)))
                 .toList(),
             onChanged: (value) {
               if (value == null) return;
@@ -307,6 +347,34 @@ class _SalaryScreenState extends State<SalaryScreen2> {
                 Text(label2, style: const TextStyle(color: Colors.grey)),
                 Text(value2, style: const TextStyle(fontWeight: FontWeight.bold)),
               ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // 산출세부내역용 row
+  Widget _buildFormulaRow(String label, String value) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 5),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SizedBox(
+            width: 90,
+            child: Text(
+              label,
+              style: const TextStyle(color: Colors.grey, fontSize: 12),
+            ),
+          ),
+          const SizedBox(width: 8),
+          Flexible(
+            child: Text(
+              value,
+              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
+              softWrap: true,
+              textAlign: TextAlign.left,
             ),
           ),
         ],
