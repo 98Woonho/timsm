@@ -24,7 +24,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
 
-    // 💡 라우팅 설정 (지도 그리기)
+    // 💡 라우팅 설정
     return MaterialApp.router(
         title: 'TIMS-M',
         debugShowCheckedModeBanner: false,

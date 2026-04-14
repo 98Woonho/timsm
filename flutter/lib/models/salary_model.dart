@@ -86,16 +86,22 @@ class SalaryModel {
   final num deduct27;
   final num deduct28;
   final num deductAmt;
-  final String workCnt;
-  final String workAmCnt;
-  final String workPmCnt;
+  final num workCnt;
+  final num workAmCnt;
+  final num workPmCnt;
   final num extenCnt;
   final num midntCnt;
-  final num holiCnt;
+  final num holiWorkCnt;
   final num timePay;
   final num workTimeCnt;
   final num holiAmDay;
   final num holiPmDay;
+  final String monthName;
+  final num holiCnt;
+  final num vacUseCnt;
+  final num vacCnt;
+  final num eduCnt;
+  final num acctCnt;
 
   SalaryModel({
     required this.payYm,
@@ -190,11 +196,17 @@ class SalaryModel {
     required this.workPmCnt,
     required this.extenCnt,
     required this.midntCnt,
-    required this.holiCnt,
+    required this.holiWorkCnt,
     required this.timePay,
     required this.workTimeCnt,
     required this.holiAmDay,
     required this.holiPmDay,
+    required this.monthName,
+    required this.holiCnt,
+    required this.vacUseCnt,
+    required this.vacCnt,
+    required this.eduCnt,
+    required this.acctCnt
   });
 
 
@@ -287,16 +299,22 @@ class SalaryModel {
       deduct27: json['deduct27'] ?? 0,
       deduct28: json['deduct28'] ?? 0,
       deductAmt: json['deductAmt'] ?? 0,
-      workCnt: json['workCnt']?.toString() ?? '0',
-      workAmCnt: json['workAmCnt']?.toString() ?? '0',
-      workPmCnt: json['workPmCnt']?.toString() ?? '0',
+      workCnt: json['workCnt'] ?? 0,
+      workAmCnt: json['workAmCnt'] ?? 0,
+      workPmCnt: json['workPmCnt'] ?? 0,
       extenCnt: json['extenCnt'] ?? 0,
       midntCnt: json['midntCnt'] ?? 0,
-      holiCnt: json['holiCnt'] ?? 0,
+      holiWorkCnt: json['holiWorkCnt'] ?? 0,
       timePay: json['timePay'] ?? 0,
       workTimeCnt: json['workTimeCnt'] ?? 0,
       holiAmDay: json['holiAmDay'] ?? 0,
       holiPmDay: json['holiPmDay'] ?? 0,
+      monthName: json['monthName']?.toString() ?? '',
+      holiCnt: json['holiCnt'] ?? 0,
+      vacUseCnt: json['vacUseCnt'] ?? 0,
+      vacCnt: json['vacCnt'] ?? 0,
+      eduCnt: json['eduCnt'] ?? 0,
+      acctCnt: json['acctCnt'] ?? 0,
     );
   }
 }

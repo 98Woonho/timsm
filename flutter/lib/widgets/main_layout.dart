@@ -12,7 +12,10 @@ class MainLayout extends StatelessWidget {
     return Scaffold(
       // 공통 상단바
       appBar: AppBar(
-        title: const Text('TIMS-M'),
+        title: Image.asset(
+          'assets/images/Taeyoung_logo.png',
+          height: 30,  // 적절한 높이로 조절
+        ),
         centerTitle: true,
         backgroundColor: Colors.white,
         foregroundColor: Colors.blueGrey,
@@ -27,7 +30,7 @@ class MainLayout extends StatelessWidget {
         onTap: (int index) => _onItemTapped(index, context), // 탭 클릭 시 이동
         items: const [
           BottomNavigationBarItem(icon: Icon(Icons.home), label: '홈'),
-          BottomNavigationBarItem(icon: Icon(Icons.receipt_long), label: '급여조회'),
+         // BottomNavigationBarItem(icon: Icon(Icons.receipt_long), label: '급여조회'),
           BottomNavigationBarItem(icon: Icon(Icons.person), label: '마이페이지'),
         ],
       ),
